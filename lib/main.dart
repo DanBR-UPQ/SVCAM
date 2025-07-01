@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:svcam_v_0_0_1/pages/boton_de_emergencia_page';
+import 'package:svcam_v_0_0_1/pages/boton_de_emergencia_page.dart';
 import 'package:svcam_v_0_0_1/pages/configuracion_page.dart';
-import 'package:svcam_v_0_0_1/pages/historial_page';
-import 'package:svcam_v_0_0_1/pages/cambiar_codigo_page';
-import 'package:svcam_v_0_0_1/pages/generar_codigo_page';
-import 'package:svcam_v_0_0_1/pages/consultar_codigos_page';
-import 'package:svcam_v_0_0_1/pages/soporte_tecnico_page';
+import 'package:svcam_v_0_0_1/pages/historial_page.dart';
+import 'package:svcam_v_0_0_1/pages/cambiar_codigo_page.dart';
+import 'package:svcam_v_0_0_1/pages/generar_codigo_page.dart';
+import 'package:svcam_v_0_0_1/pages/consultar_codigos_page.dart';
+import 'package:svcam_v_0_0_1/pages/soporte_tecnico_page.dart';
 
 
 void main() {
