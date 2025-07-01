@@ -190,7 +190,7 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> {
                           const Icon(Icons.repeat, size: 20, color: Colors.grey),
                           const SizedBox(width: 10),
                           Text(
-                            'Usos restantes: ${_detalleUsos}',
+                            'Usos restantes: $_detalleUsos',
                             style: const TextStyle(fontSize: 16),
                           ),
                         ],
