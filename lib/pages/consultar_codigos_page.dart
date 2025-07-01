@@ -54,14 +54,14 @@ class ConsultarCodigosPage extends StatelessWidget {
               ),
             ),
 
-            // Título de lista
+            // Titulo
             Text(
               'Códigos generados:',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 10),
 
-            // Lista de códigos
+            // Códigos
             Expanded(
               child: ListView.builder(
                 itemCount: codigosGenerados.length,

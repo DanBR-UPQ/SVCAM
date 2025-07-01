@@ -75,7 +75,7 @@ class CambiarCodigoPage extends StatelessWidget {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              // Aquí iría la lógica para generar un nuevo código
+                              // Lógica para generar código nuevo
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Código cambiado con éxito')),

@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Header Section
+            // Parte de arriba
             Container(
               width: double.infinity,
               decoration: const BoxDecoration(
@@ -131,26 +131,26 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             
-            // Main Content
+            // Parte principal
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: [
-                  // Quick Actions Section
+                            //ACCIONES PRINCIPALES
                   _buildSectionTitle('Acciones Principales'),
                   const SizedBox(height: 16),
                   _buildQuickActionsGrid(),
                   
                   const SizedBox(height: 30),
                   
-                  // Management Section
+                            // GESTIÓN
                   _buildSectionTitle('Gestión del Sistema'),
                   const SizedBox(height: 16),
                   _buildManagementGrid(),
                   
                   const SizedBox(height: 30),
                   
-                  // Support Section
+                            // SOPORTE
                   _buildSectionTitle('Soporte y Configuración'),
                   const SizedBox(height: 16),
                   _buildSupportGrid(),
@@ -163,6 +163,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+
+
+
+// Titulo
   Widget _buildSectionTitle(String title) {
     return Align(
       alignment: Alignment.centerLeft,
@@ -177,6 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+// Acciones Principales
   Widget _buildQuickActionsGrid() {
     return Row(
       children: [
@@ -201,6 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+// Gestión
   Widget _buildManagementGrid() {
     return Column(
       children: [
@@ -246,6 +252,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+// Soporte
   Widget _buildSupportGrid() {
     return Row(
       children: [
