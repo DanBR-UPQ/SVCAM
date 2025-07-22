@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "725505399516",
+    "project_id": "svcam-dev",
+    "storage_bucket": "svcam-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725505399516:android:66d5d4102787ea8abef219",
+        "android_client_info": {
+          "package_name": "com.example.svcam_v_0_0_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbhGH0C9qf2Wi4AX43Vau33qzJ5QJExVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
