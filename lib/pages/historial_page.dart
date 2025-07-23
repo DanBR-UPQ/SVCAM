@@ -121,8 +121,9 @@ class _HistorialPageState extends State<HistorialPage> with TickerProviderStateM
         child: Column(
           children: [
             // Header con estadísticas
-            _buildStatsHeader(),
+            //_buildStatsHeader(),
             
+            const SizedBox(height: 14),
             // Filtros
             _buildFiltersSection(),
             
@@ -203,7 +204,7 @@ class _HistorialPageState extends State<HistorialPage> with TickerProviderStateM
           const Text(
             'Filtrar por:',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 17,
               fontWeight: FontWeight.w600,
               color: Colors.white,
             ),
