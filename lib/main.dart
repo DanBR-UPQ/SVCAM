@@ -69,6 +69,9 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+
+
+
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   int codigoPersonal = 1234;
   late AnimationController _animationController;
@@ -97,53 +100,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     super.dispose();
   }
 
+
+//===========================================================================
+//                                  APPBAR
+//===========================================================================
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1E293B),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E3A8A),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.shield_outlined, size: 20, color: Colors.white),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              widget.title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/perfilPage');
-            },
-            icon: const Icon(Icons.account_circle_outlined),
-            tooltip: 'Perfil',
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/configuracionPage');
-            },
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Configuración',
-          ),
-        ],
-      ),
+      
+//===========================================================================
+//                                  BODY
+//===========================================================================
+
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: SingleChildScrollView(
@@ -153,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               _buildAnimatedHeader(),
               
               // Estadísticas rápidas
-              _buildQuickStats(),
+              //_buildQuickStats(),
               
               // Contenido principal
               Padding(
@@ -161,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 child: Column(
                   children: [
                     _buildAllFunctionsGrid(),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -172,78 +143,108 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     );
   }
 
+
+//===========================================================================
+//                                  WIDGETS
+//===========================================================================
+
+
+
   Widget _buildAnimatedHeader() {
     return Container(
       width: double.infinity,
-      height: 200,
+      height: 231,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF1E3A8A),
-            Color(0xFF3B82F6),
-            Color(0xFF1E40AF),
+            Color.fromARGB(255, 16, 31, 71),
+            Color.fromARGB(255, 27, 72, 144),
+            Color.fromARGB(255, 16, 31, 71),
           ],
         ),
       ),
       child: Stack(
         children: [
-          // Patrón de fondo
           Positioned.fill(
             child: CustomPaint(
               painter: CircuitPatternPainter(),
             ),
           ),
-          // Contenido principal
+
+          // Coso del perfil y config
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/perfilPage');
+                  },
+                  icon: const Icon(Icons.account_circle_outlined, color: Colors.white),
+                  tooltip: 'Perfil',
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/configuracionPage');
+                  },
+                  icon: const Icon(Icons.settings_outlined, color: Colors.white),
+                  tooltip: 'Configuración',
+                ),
+              ],
+            ),
+          ),
+
+          // Logo, nombre, etc
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(height: 25),
                 TweenAnimationBuilder<double>(
                   tween: Tween<double>(begin: 0.0, end: 1.0),
                   duration: const Duration(milliseconds: 1200),
                   builder: (context, value, child) {
                     return Transform.scale(
                       scale: value,
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
-                            width: 2,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.security,
-                          size: 48,
-                          color: Colors.white,
-                        ),
+                      child: Image.asset(
+                        'assets/images/logoSVCAM.png',
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
                       ),
                     );
                   },
                 ),
-                const SizedBox(height: 16),
                 const Text(
-                  'Sistema de Control de Acceso',
+                  '¡Bienvenido!',
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 28,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                     letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const Text(
+                  'Daniel',
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                ),
                 Text(
                   'Seguridad inteligente para tu condominio',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
+                const SizedBox(height: 6),
               ],
             ),
           ),
@@ -251,6 +252,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       ),
     );
   }
+
 
   Widget _buildQuickStats() {
     return Container(
@@ -321,6 +323,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       ],
     );
   }
+
+
+//===========================================================================
+//                                  WIDGETS BODY
+//===========================================================================
+
 
   Widget _buildAllFunctionsGrid() {
     return Column(
@@ -411,11 +419,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     bool isHighlighted = false,
     double height = 120,
   }) {
-    // Calculamos el ancho aproximado para hacer el container 1.2 veces más largo que ancho
     return LayoutBuilder(
       builder: (context, constraints) {
         final cardWidth = constraints.maxWidth;
-        final cardHeight = cardWidth * 1.2; // 1.2 veces más largo que ancho
+        final cardHeight = cardWidth * 1.13; // 1.13 veces más largo que ancho
         
         return GestureDetector(
           onTap: onTap,
@@ -492,32 +499,39 @@ class CircuitPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = Colors.white.withOpacity(0.08)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
-    final path = Path();
-    
-    // Crear un patrón de circuito simple
-    for (int i = 0; i < 5; i++) {
-      for (int j = 0; j < 3; j++) {
-        final x = (size.width / 4) * i;
-        final y = (size.height / 2) * j;
+    final dotPaint = Paint()
+      ..color = Colors.white.withOpacity(0.12)
+      ..style = PaintingStyle.fill;
+
+    const spacingX = 60.0;
+    const spacingY = 40.0;
+    const connectorLength = 20.0;
+
+    for (double x = 0; x < size.width; x += spacingX) {
+      for (double y = 0; y < size.height; y += spacingY) {
+        final start = Offset(x, y);
+
         
-        // Líneas horizontales
-        path.moveTo(x, y);
-        path.lineTo(x + 30, y);
+        canvas.drawCircle(start, 2, dotPaint);
+
+        final horizontalEnd = Offset(x + connectorLength, y);
+        final verticalEnd = Offset(x, y + connectorLength);
+
+       
+        canvas.drawLine(start, horizontalEnd, paint);
+        canvas.drawLine(start, verticalEnd, paint);
+
         
-        // Líneas verticales
-        path.moveTo(x, y);
-        path.lineTo(x, y + 20);
-        
-        // Pequeños círculos en las conexiones
-        canvas.drawCircle(Offset(x, y), 2, paint);
+        if (x + spacingX < size.width && y + spacingY < size.height) {
+          final elbow = Offset(x + connectorLength, y + spacingY);
+          canvas.drawLine(horizontalEnd, elbow, paint);
+        }
       }
     }
-    
-    canvas.drawPath(path, paint);
   }
 
   @override

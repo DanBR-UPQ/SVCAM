@@ -126,7 +126,7 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
                   size: 24,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 9),
               const Text(
                 'Confirmar generación',
                 style: TextStyle(
@@ -341,8 +341,8 @@ Generado por SVCAM - Sistema de Control de Acceso
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header informativo
-                _buildInfoHeader(),
-                const SizedBox(height: 24),
+                //_buildInfoHeader(),
+                //const SizedBox(height: 24),
                 
                 // Selector de tipo
                 _buildTipoSelector(),
@@ -411,20 +411,22 @@ Generado por SVCAM - Sistema de Control de Acceso
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Generar Nuevo Código',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                /*
+                  Text(
+                    'Generar Nuevo Código',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                SizedBox(height: 4),
+                  SizedBox(height: 4),
+                  */
                 Text(
                   'Complete la información para crear un código de acceso temporal',
                   style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
+                    fontSize: 15,
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -601,54 +603,56 @@ Generado por SVCAM - Sistema de Control de Acceso
   }
 
   Widget _buildCodigoResult() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF334155),
-          width: 1,
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E293B),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: const Color(0xFF334155),
+            width: 1,
+          ),
         ),
-      ),
-      child: Column(
-        children: [
-          Text(
-            'Código generado:',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.white.withOpacity(0.8),
+        child: Column(
+          children: [
+            Text(
+              'Código generado:',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white.withOpacity(0.8),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          AnimatedBuilder(
-            animation: _codeAnimation,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: _codeAnimation.value,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF10B981), Color(0xFF059669)],
+            const SizedBox(height: 16),
+            AnimatedBuilder(
+              animation: _codeAnimation,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _codeAnimation.value,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF10B981), Color(0xFF059669)],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    codigoGenerado,
-                    style: const TextStyle(
-                      fontSize: 42,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 8,
-                      color: Colors.white,
+                    child: Text(
+                      codigoGenerado,
+                      style: const TextStyle(
+                        fontSize: 42,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 8,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
-          ),
-        ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
