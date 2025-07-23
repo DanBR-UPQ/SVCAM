@@ -92,7 +92,7 @@ class _HistorialPageState extends State<HistorialPage> with TickerProviderStateM
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: const Color(0xFFF59E0B),
+                color: const Color.fromARGB(255, 49, 176, 170),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(Icons.history, size: 20, color: Colors.white),

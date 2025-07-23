@@ -144,7 +144,7 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
                 '¿Deseas generar este código con la siguiente información?',
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.8),
-                  fontSize: 14,
+                  fontSize: 16,
                 ),
               ),
               const SizedBox(height: 16),
@@ -188,13 +188,13 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 80,
+            width: 95,
             child: Text(
               '$label:',
               style: const TextStyle(
                 color: Color(0xFF3B82F6),
                 fontWeight: FontWeight.w600,
-                fontSize: 12,
+                fontSize: 14,
               ),
             ),
           ),
@@ -203,7 +203,7 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
               value,
               style: TextStyle(
                 color: Colors.white.withOpacity(0.9),
-                fontSize: 12,
+                fontSize: 14,
               ),
             ),
           ),
@@ -236,7 +236,7 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
         content: Row(
           children: [
             const Icon(Icons.error_outline, color: Colors.white),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Text(mensaje),
           ],
         ),
@@ -253,7 +253,7 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
         content: Row(
           children: [
             const Icon(Icons.check_circle_outline, color: Colors.white),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Text(mensaje),
           ],
         ),
