@@ -11,7 +11,7 @@ plugins {
 android {
     namespace = "com.example.svcam_v_0_0_1"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
