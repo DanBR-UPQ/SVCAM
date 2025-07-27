@@ -101,7 +101,7 @@ class _SoporteTecnicoPageState extends State<SoporteTecnicoPage> with TickerProv
           child: Column(
             children: [
               // Header animado
-              _buildAnimatedHeader(),
+              // _buildAnimatedHeader(),
               
               // Contenido principal
               Padding(
@@ -130,8 +130,8 @@ class _SoporteTecnicoPageState extends State<SoporteTecnicoPage> with TickerProv
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
+             Color(0xFF475569),
             Color(0xFF64748B),
-            Color(0xFF94A3B8),
             Color(0xFF475569),
           ],
         ),
