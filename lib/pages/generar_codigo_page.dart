@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math';
 
 class GenerarCodigoPage extends StatefulWidget {
   const GenerarCodigoPage({super.key});
@@ -19,6 +21,7 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
   String _detalleDescripcion = '';
   String _detalleUsos = '';
   String _tipoSeleccionado = 'visita';
+  bool _guardandoEnDB = false;
   
   // Animaciones
   late AnimationController _animationController;
@@ -27,13 +30,9 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
   late Animation<double> _scaleAnimation;
   late Animation<double> _codeAnimation;
 
-  // Datos de placeholder para demostración
-  final List<Map<String, String>> _codigosPlaceholder = [
-    {'codigo': '4938', 'descripcion': 'Acceso jardineros', 'usos': '5'},
-    {'codigo': '7621', 'descripcion': 'Entrega paquetes', 'usos': '2'},
-    {'codigo': '9054', 'descripcion': 'Visita familiar', 'usos': '3'},
-    {'codigo': '1847', 'descripcion': 'Mantenimiento piscina', 'usos': '1'},
-  ];
+  // Instancia de Firestore
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final String _usuarioID = 'OQAdSwItMYPEx3v35uDY';
 
   final Map<String, Map<String, dynamic>> _tiposAcceso = {
     'visita': {
@@ -97,9 +96,74 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
     _animationController.forward();
   }
 
+
+//===========================================================================
+//                    LÓGICA DE GENERAR / GUARDAR CÓDIGO
+//===========================================================================
+
+
+  // Generar codigo
+  int _generarCodigoUnico() {
+    final random = Random();
+    return 1000 + random.nextInt(9000);
+  }
+
+  // Verificar si el codigo ya está en firebase
+  Future<bool> _codigoExiste(int codigo) async {
+    try {
+      final QuerySnapshot result = await _firestore
+          .collection('codigos')
+          .where('codigo', isEqualTo: codigo)
+          .where('esValido', isEqualTo: true)
+          .get();
+      
+      return result.docs.isNotEmpty;
+    } catch (e) {
+      print('Error verificando código: $e');
+      return false;
+    }
+  }
+
+  // Generar codigo
+  Future<int> _generarCodigoUnicoEnDB() async {
+    int codigo;
+    bool existe;
+    
+    do {
+      codigo = _generarCodigoUnico();
+      existe = await _codigoExiste(codigo);
+    } while (existe);
+    
+    return codigo;
+  }
+
+  // Guardar codigo en base de datos
+  Future<bool> _guardarCodigoEnFirestore(int codigo) async {
+    try {
+      await _firestore.collection('codigos').add({
+        'codigo': codigo,
+        'descripcion': _descripcionController.text.trim(),
+        'esValido': true,
+        'fechaCreacion': FieldValue.serverTimestamp(),
+        'tipo': _tipoSeleccionado,
+        'usos': 0,
+        'usosMax': int.parse(_usosController.text),
+        'usuarioID': _usuarioID,
+      });
+      
+      return true;
+    } catch (e) {
+      print('Error guardando código: $e');
+      return false;
+    }
+  }
+
   void _mostrarConfirmacion(BuildContext context) {
-    if (_descripcionController.text.isEmpty || _usosController.text.isEmpty) {
-      _mostrarError('Por favor, complete todos los campos');
+    if (_descripcionController.text.trim().isEmpty || 
+        _usosController.text.trim().isEmpty ||
+        int.tryParse(_usosController.text.trim()) == null ||
+        int.parse(_usosController.text.trim()) <= 0) {
+      _mostrarError('Por favor, complete todos los campos correctamente');
       return;
     }
 
@@ -162,7 +226,7 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: _guardandoEnDB ? null : () {
                 Navigator.of(context).pop();
                 _generarCodigo();
               },
@@ -173,7 +237,16 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Generar'),
+              child: _guardandoEnDB 
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Text('Generar'),
             ),
           ],
         );
@@ -212,22 +285,44 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
     );
   }
 
-  void _generarCodigo() {
-    // Generar un código aleatorio de los placeholders
-    final randomIndex = DateTime.now().millisecondsSinceEpoch % _codigosPlaceholder.length;
-    final nuevoCodigo = _codigosPlaceholder[randomIndex];
-    
+  Future<void> _generarCodigo() async {
     setState(() {
-      codigoGenerado = nuevoCodigo['codigo']!;
-      _detalleDescripcion = _descripcionController.text;
-      _detalleUsos = _usosController.text;
-      _mostrarDetalles = true;
+      _guardandoEnDB = true;
     });
-    
-    _codeAnimationController.reset();
-    _codeAnimationController.forward();
-    
-    _mostrarExito('¡Código generado exitosamente!');
+
+    try {
+      // Generar codigo unico
+      final int nuevoCodigo = await _generarCodigoUnicoEnDB();
+      
+      // Guardar en Firestore
+      final bool guardadoExitoso = await _guardarCodigoEnFirestore(nuevoCodigo);
+      
+      if (guardadoExitoso) {
+        setState(() {
+          codigoGenerado = nuevoCodigo.toString();
+          _detalleDescripcion = _descripcionController.text.trim();
+          _detalleUsos = _usosController.text.trim();
+          _mostrarDetalles = true;
+          _guardandoEnDB = false;
+        });
+        
+        _codeAnimationController.reset();
+        _codeAnimationController.forward();
+        
+        _mostrarExito('¡Código generado y guardado exitosamente!');
+      } else {
+        setState(() {
+          _guardandoEnDB = false;
+        });
+        _mostrarError('Error al guardar el código. Intenta nuevamente.');
+      }
+    } catch (e) {
+      setState(() {
+        _guardandoEnDB = false;
+      });
+      _mostrarError('Error al generar el código. Intenta nuevamente.');
+      print('Error en _generarCodigo: $e');
+    }
   }
 
   void _mostrarError(String mensaje) {
@@ -237,7 +332,7 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
           children: [
             const Icon(Icons.error_outline, color: Colors.white),
             const SizedBox(width: 14),
-            Text(mensaje),
+            Expanded(child: Text(mensaje)),
           ],
         ),
         backgroundColor: const Color(0xFFEF4444),
@@ -254,7 +349,7 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
           children: [
             const Icon(Icons.check_circle_outline, color: Colors.white),
             const SizedBox(width: 14),
-            Text(mensaje),
+            Expanded(child: Text(mensaje)),
           ],
         ),
         backgroundColor: const Color(0xFF10B981),
@@ -270,20 +365,20 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
   }
 
   void _compartirCodigo() {
-    /*
     final mensaje = '''
 CÓDIGO DE ACCESO GENERADO
 
 Código: $codigoGenerado
 Descripción: $_detalleDescripcion
 Usos disponibles: $_detalleUsos
+Tipo: ${_tiposAcceso[_tipoSeleccionado]!['nombre']}
 
 Generado por SVCAM - Sistema de Control de Acceso
     ''';
     
-    // Agregar lógica de compartir 
+    // Aquí puedes implementar la lógica de compartir usando share_plus
     _mostrarExito('Preparando para compartir...');
-    */
+    print('Mensaje a compartir: $mensaje'); // Para debug
   }
 
   @override
@@ -342,10 +437,6 @@ Generado por SVCAM - Sistema de Control de Acceso
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header informativo
-                //_buildInfoHeader(),
-                //const SizedBox(height: 24),
-                
                 // Selector de tipo
                 _buildTipoSelector(),
                 const SizedBox(height: 24),
@@ -379,8 +470,6 @@ Generado por SVCAM - Sistema de Control de Acceso
       ),
     );
   }
-
-
 
   Widget _buildTipoSelector() {
     return Column(
@@ -519,9 +608,9 @@ Generado por SVCAM - Sistema de Control de Acceso
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () => _mostrarConfirmacion(context),
+        onPressed: _guardandoEnDB ? null : () => _mostrarConfirmacion(context),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF10B981),
+          backgroundColor: _guardandoEnDB ? Colors.grey : const Color(0xFF10B981),
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
@@ -529,20 +618,42 @@ Generado por SVCAM - Sistema de Control de Acceso
           ),
           elevation: 4,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.lock_open_outlined, size: 24),
-            const SizedBox(width: 12),
-            const Text(
-              'Generar Código',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+        child: _guardandoEnDB
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Generando...',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.lock_open_outlined, size: 24),
+                const SizedBox(width: 12),
+                const Text(
+                  'Generar Código',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
       ),
     );
   }

@@ -416,7 +416,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
-    bool isHighlighted = false,
     double height = 120,
   }) {
     return LayoutBuilder(

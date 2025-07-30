@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math';
 
 class CambiarCodigoPage extends StatefulWidget {
   const CambiarCodigoPage({super.key});
@@ -10,9 +12,15 @@ class CambiarCodigoPage extends StatefulWidget {
 
 class _CambiarCodigoPageState extends State<CambiarCodigoPage> with TickerProviderStateMixin {
   // Código actual del usuario
-  int codigoPersonalActual = 1234;
+  int? codigoPersonalActual;
   int? codigoPersonalNuevo;
   bool _codigoCambiado = false;
+  bool _cargandoDatos = true;
+  bool _cambiandoCodigo = false;
+  
+  // Instancia de Firestore
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final String _usuarioID = 'OQAdSwItMYPEx3v35uDY';
   
   // Animaciones
   late AnimationController _animationController;
@@ -52,6 +60,9 @@ class _CambiarCodigoPageState extends State<CambiarCodigoPage> with TickerProvid
     
     _animationController.forward();
     _pulseController.repeat(reverse: true);
+    
+    // Cargar código personal actual
+    _cargarCodigoPersonal();
   }
 
   @override
@@ -61,7 +72,92 @@ class _CambiarCodigoPageState extends State<CambiarCodigoPage> with TickerProvid
     super.dispose();
   }
 
+  // Cargar código personal desde Firestore
+  Future<void> _cargarCodigoPersonal() async {
+    try {
+      final DocumentSnapshot userDoc = await _firestore
+          .collection('Usuarios')
+          .doc(_usuarioID)
+          .get();
+      
+      if (userDoc.exists) {
+        final data = userDoc.data() as Map<String, dynamic>;
+        setState(() {
+          codigoPersonalActual = data['codigoPersonal'] as int?;
+          _cargandoDatos = false;
+        });
+      } else {
+        _mostrarError('Usuario no encontrado');
+        setState(() {
+          _cargandoDatos = false;
+        });
+      }
+    } catch (e) {
+      print('Error cargando código personal: $e');
+      _mostrarError('Error al cargar los datos del usuario');
+      setState(() {
+        _cargandoDatos = false;
+      });
+    }
+  }
+
+  // Generar código personal único de 4 dígitos
+  int _generarCodigoPersonal() {
+    final random = Random();
+    return 1000 + random.nextInt(9000); // Genera números entre 1000 y 9999
+  }
+
+  // Verificar si el código personal ya existe
+  Future<bool> _codigoPersonalExiste(int codigo) async {
+    try {
+      final QuerySnapshot result = await _firestore
+          .collection('Usuarios')
+          .where('codigoPersonal', isEqualTo: codigo)
+          .get();
+      
+      return result.docs.isNotEmpty;
+    } catch (e) {
+      print('Error verificando código personal: $e');
+      return false;
+    }
+  }
+
+  // Generar código personal único
+  Future<int> _generarCodigoPersonalUnico() async {
+    int codigo;
+    bool existe;
+    
+    do {
+      codigo = _generarCodigoPersonal();
+      existe = await _codigoPersonalExiste(codigo);
+    } while (existe);
+    
+    return codigo;
+  }
+
+  // Actualizar código personal en Firestore
+  Future<bool> _actualizarCodigoPersonal(int nuevoCodigo) async {
+    try {
+      await _firestore
+          .collection('Usuarios')
+          .doc(_usuarioID)
+          .update({
+        'codigoPersonal': nuevoCodigo,
+      });
+      
+      return true;
+    } catch (e) {
+      print('Error actualizando código personal: $e');
+      return false;
+    }
+  }
+
   void _mostrarConfirmacionCambio() {
+    if (codigoPersonalActual == null) {
+      _mostrarError('No se pudo cargar el código actual');
+      return;
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -141,14 +237,14 @@ class _CambiarCodigoPageState extends State<CambiarCodigoPage> with TickerProvid
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: _cambiandoCodigo ? null : () => Navigator.of(context).pop(),
               child: const Text(
                 'Cancelar',
                 style: TextStyle(color: Color(0xFF64748B)),
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: _cambiandoCodigo ? null : () {
                 Navigator.of(context).pop();
                 _cambiarCodigo();
               },
@@ -159,7 +255,16 @@ class _CambiarCodigoPageState extends State<CambiarCodigoPage> with TickerProvid
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Cambiar Código'),
+              child: _cambiandoCodigo
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Text('Cambiar Código'),
             ),
           ],
         );
@@ -167,17 +272,56 @@ class _CambiarCodigoPageState extends State<CambiarCodigoPage> with TickerProvid
     );
   }
 
-  void _cambiarCodigo() {
-    // Simular generación de nuevo código
-    final nuevosCodigos = [5678, 9012, 3456, 7890, 2468];
-    final randomIndex = DateTime.now().millisecondsSinceEpoch % nuevosCodigos.length;
-    
+  Future<void> _cambiarCodigo() async {
     setState(() {
-      codigoPersonalNuevo = nuevosCodigos[randomIndex];
-      _codigoCambiado = true;
+      _cambiandoCodigo = true;
     });
-    
-    _mostrarExito('¡Código cambiado exitosamente!');
+
+    try {
+      // Generar nuevo código único
+      final int nuevoCodigo = await _generarCodigoPersonalUnico();
+      
+      // Actualizar en Firestore
+      final bool actualizado = await _actualizarCodigoPersonal(nuevoCodigo);
+      
+      if (actualizado) {
+        setState(() {
+          codigoPersonalNuevo = nuevoCodigo;
+          _codigoCambiado = true;
+          _cambiandoCodigo = false;
+        });
+        
+        _mostrarExito('¡Código cambiado exitosamente!');
+      } else {
+        setState(() {
+          _cambiandoCodigo = false;
+        });
+        _mostrarError('Error al cambiar el código. Intenta nuevamente.');
+      }
+    } catch (e) {
+      setState(() {
+        _cambiandoCodigo = false;
+      });
+      _mostrarError('Error al cambiar el código. Intenta nuevamente.');
+      print('Error en _cambiarCodigo: $e');
+    }
+  }
+
+  void _mostrarError(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white),
+            const SizedBox(width: 14),
+            Expanded(child: Text(mensaje)),
+          ],
+        ),
+        backgroundColor: const Color(0xFFEF4444),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   void _mostrarExito(String mensaje) {
@@ -187,7 +331,7 @@ class _CambiarCodigoPageState extends State<CambiarCodigoPage> with TickerProvid
           children: [
             const Icon(Icons.check_circle_outline, color: Colors.white),
             const SizedBox(width: 14),
-            Text(mensaje),
+            Expanded(child: Text(mensaje)),
           ],
         ),
         backgroundColor: const Color(0xFF10B981),
@@ -205,6 +349,7 @@ class _CambiarCodigoPageState extends State<CambiarCodigoPage> with TickerProvid
   void _resetearCambio() {
     setState(() {
       _codigoCambiado = false;
+      codigoPersonalActual = codigoPersonalNuevo;
       codigoPersonalNuevo = null;
     });
   }
@@ -259,11 +404,13 @@ class _CambiarCodigoPageState extends State<CambiarCodigoPage> with TickerProvid
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (!_codigoCambiado) ...[
-                      // Header informativo
-                      //_buildInfoHeader(),
-                      //const SizedBox(height: 32),
-                      
+                    if (_cargandoDatos) ...[
+                      // Loading
+                      _buildCargando(),
+                    ] else if (codigoPersonalActual == null) ...[
+                      // Error de carga
+                      _buildErrorCarga(),
+                    ] else if (!_codigoCambiado) ...[
                       // Código actual
                       _buildCodigoActual(),
                       const SizedBox(height: 32),
@@ -290,9 +437,83 @@ class _CambiarCodigoPageState extends State<CambiarCodigoPage> with TickerProvid
     );
   }
 
+  Widget _buildCargando() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 100),
+          const CircularProgressIndicator(
+            color: Color(0xFF3B82F6),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Cargando tu código personal...',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white.withOpacity(0.7),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildErrorCarga() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 100),
+          const Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Color(0xFFEF4444),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Error al cargar el código personal',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.white.withOpacity(0.9),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'No se pudo conectar con la base de datos',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white.withOpacity(0.6),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton.icon(
+            onPressed: () {
+              setState(() {
+                _cargandoDatos = true;
+              });
+              _cargarCodigoPersonal();
+            },
+            icon: const Icon(Icons.refresh),
+            label: const Text('Reintentar'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF3B82F6),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-Widget _buildCodigoActual() {
+  Widget _buildCodigoActual() {
     return Center(
       child: Container(
         padding: const EdgeInsets.all(32),
@@ -316,7 +537,7 @@ Widget _buildCodigoActual() {
             ),
             const SizedBox(height: 20),
             GestureDetector(
-              onTap: () => _copiarCodigo(codigoPersonalActual),
+              onTap: () => _copiarCodigo(codigoPersonalActual!),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
                 decoration: BoxDecoration(
@@ -328,7 +549,7 @@ Widget _buildCodigoActual() {
                 child: Column(
                   children: [
                     Text(
-                      codigoPersonalActual.toString(),
+                      codigoPersonalActual.toString().padLeft(4, '0'),
                       style: const TextStyle(
                         fontSize: 42,
                         fontWeight: FontWeight.w900,
@@ -365,7 +586,6 @@ Widget _buildCodigoActual() {
       ),
     );
   }
-
 
   Widget _buildAdvertencia() {
     return Container(
@@ -465,7 +685,7 @@ Widget _buildCodigoActual() {
           children: [
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () => Navigator.pop(context),
+                onPressed: _cambiandoCodigo ? null : () => Navigator.pop(context),
                 icon: const Icon(Icons.close, size: 20),
                 label: const Text('No, mantener'),
                 style: OutlinedButton.styleFrom(
@@ -481,11 +701,20 @@ Widget _buildCodigoActual() {
             const SizedBox(width: 16),
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: _mostrarConfirmacionCambio,
-                icon: const Icon(Icons.sync_alt, size: 20),
-                label: const Text('Sí, cambiar'),
+                onPressed: _cambiandoCodigo ? null : _mostrarConfirmacionCambio,
+                icon: _cambiandoCodigo 
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.sync_alt, size: 20),
+                label: Text(_cambiandoCodigo ? 'Cambiando...' : 'Sí, cambiar'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEF4444),
+                  backgroundColor: _cambiandoCodigo ? Colors.grey : const Color(0xFFEF4444),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -504,7 +733,6 @@ Widget _buildCodigoActual() {
   Widget _buildCodigoCambiado() {
     return Column(
       children: [
-        
         // Nuevo código
         Center(
           child: Container(
@@ -541,7 +769,7 @@ Widget _buildCodigoActual() {
                     child: Column(
                       children: [
                         Text(
-                          codigoPersonalNuevo.toString(),
+                          codigoPersonalNuevo.toString().padLeft(4, '0'),
                           style: const TextStyle(
                             fontSize: 42,
                             fontWeight: FontWeight.w900,
