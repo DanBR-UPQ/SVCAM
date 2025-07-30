@@ -10,7 +10,7 @@ class ConsultarCodigosPage extends StatefulWidget {
 
 class _ConsultarCodigosPageState extends State<ConsultarCodigosPage> with TickerProviderStateMixin {
   // Código personal del usuario
-  final int codigoPersonal = 9999;
+  final codigoPersonal = '9999';
   
   // Lista de códigos generados con información más detallada
   final List<Map<String, dynamic>> codigosGenerados = [
@@ -305,84 +305,45 @@ class _ConsultarCodigosPageState extends State<ConsultarCodigosPage> with Ticker
     );
   }
 
-  Widget _buildCodigoPersonal() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1E3A8A),
-            Color(0xFF3B82F6),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.person_outline,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Tu Código Personal',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Código permanente para acceso personal',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+Widget _buildCodigoPersonal() {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E293B),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: const Color(0xFF334155),
+            width: 1,
           ),
-          const SizedBox(height: 20),
-          Center(
-            child: GestureDetector(
-              onTap: () => _copiarCodigo(codigoPersonal.toString()),
+        ),
+        child: Column(
+          children: [
+            Text(
+              'Tu código personal:',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.white.withOpacity(0.8),
+              ),
+            ),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () => _copiarCodigo(codigoPersonal),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
-                    width: 1,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
                   ),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
                   children: [
                     Text(
                       codigoPersonal.toString(),
                       style: const TextStyle(
-                        fontSize: 36,
+                        fontSize: 42,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 8,
                         color: Colors.white,
@@ -412,8 +373,8 @@ class _ConsultarCodigosPageState extends State<ConsultarCodigosPage> with Ticker
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -492,7 +453,7 @@ class _ConsultarCodigosPageState extends State<ConsultarCodigosPage> with Ticker
     final tipoInfo = tiposAcceso[codigo['tipo']]!;
     final isActive = codigo['activo'];
     final usosRestantes = codigo['usos'];
-    final porcentajeUso = (codigo['usosOriginales'] - usosRestantes) / codigo['usosOriginales'];
+    // final porcentajeUso = (codigo['usosOriginales'] - usosRestantes) / codigo['usosOriginales'];
     
     return GestureDetector(
       onTap: () => _mostrarDetallesCodigo(codigo),
