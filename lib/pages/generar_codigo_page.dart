@@ -270,8 +270,9 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
   }
 
   void _compartirCodigo() {
+    /*
     final mensaje = '''
-🔐 CÓDIGO DE ACCESO GENERADO
+CÓDIGO DE ACCESO GENERADO
 
 Código: $codigoGenerado
 Descripción: $_detalleDescripcion
@@ -280,8 +281,9 @@ Usos disponibles: $_detalleUsos
 Generado por SVCAM - Sistema de Control de Acceso
     ''';
     
-    // Aquí iría la lógica de compartir real
+    // Agregar lógica de compartir 
     _mostrarExito('Preparando para compartir...');
+    */
   }
 
   @override
@@ -378,64 +380,7 @@ Generado por SVCAM - Sistema de Control de Acceso
     );
   }
 
-  Widget _buildInfoHeader() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1E3A8A),
-            Color(0xFF3B82F6),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.info_outline,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /*
-                  Text(
-                    'Generar Nuevo Código',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  */
-                Text(
-                  'Complete la información para crear un código de acceso temporal',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildTipoSelector() {
     return Column(

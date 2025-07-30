@@ -137,61 +137,7 @@ class _HistorialPageState extends State<HistorialPage> with TickerProviderStateM
     );
   }
 
-  Widget _buildStatsHeader() {
-    final totalAccesos = _historialData.length;
-    final codigosActivos = _historialData.where((item) => item['estado'] == 'activo').length;
-    final codigosCompletados = _historialData.where((item) => item['estado'] == 'completado').length;
 
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1E3A8A),
-            Color(0xFF3B82F6),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildStatItem('Total', '$totalAccesos', Icons.analytics, Colors.white),
-          _buildStatItem('Activos', '$codigosActivos', Icons.check_circle, const Color(0xFF10B981)),
-          _buildStatItem('Completados', '$codigosCompletados', Icons.done_all, const Color(0xFF64748B)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value, IconData icon, Color color) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.white.withOpacity(0.8),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildFiltersSection() {
     final filters = ['Todos', 'Activos', 'Completados', 'Visitas', 'Servicios', 'Delivery'];
