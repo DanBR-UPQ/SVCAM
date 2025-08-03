@@ -186,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   icon: const Icon(Icons.account_circle_outlined, color: Colors.white),
                   tooltip: 'Perfil',
                 ),
+                /*
                 IconButton(
                   onPressed: () {
                     Navigator.pushNamed(context, '/configuracionPage');
@@ -193,6 +194,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   icon: const Icon(Icons.settings_outlined, color: Colors.white),
                   tooltip: 'Configuración',
                 ),
+                */
               ],
             ),
           ),
