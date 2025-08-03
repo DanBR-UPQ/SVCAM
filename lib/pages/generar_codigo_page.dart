@@ -364,23 +364,6 @@ class _GenerarCodigoPageState extends State<GenerarCodigoPage> with TickerProvid
     _mostrarExito('Código copiado al portapapeles');
   }
 
-  void _compartirCodigo() {
-    final mensaje = '''
-CÓDIGO DE ACCESO GENERADO
-
-Código: $codigoGenerado
-Descripción: $_detalleDescripcion
-Usos disponibles: $_detalleUsos
-Tipo: ${_tiposAcceso[_tipoSeleccionado]!['nombre']}
-
-Generado por SVCAM - Sistema de Control de Acceso
-    ''';
-    
-    // Aquí puedes implementar la lógica de compartir usando share_plus
-    _mostrarExito('Preparando para compartir...');
-    print('Mensaje a compartir: $mensaje'); // Para debug
-  }
-
   @override
   void dispose() {
     _descripcionController.dispose();
@@ -817,46 +800,25 @@ Generado por SVCAM - Sistema de Control de Acceso
   }
 
   Widget _buildActionButtons() {
-    return Column(
+    return Row(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _copiarCodigo,
-                icon: const Icon(Icons.content_copy, size: 20),
-                label: const Text('Copiar'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF3B82F6),
-                  side: const BorderSide(color: Color(0xFF3B82F6)),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: _copiarCodigo,
+            icon: const Icon(Icons.content_copy, size: 20),
+            label: const Text('Copiar'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF3B82F6),
+              side: const BorderSide(color: Color(0xFF3B82F6)),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _compartirCodigo,
-                icon: const Icon(Icons.share, size: 20),
-                label: const Text('Compartir'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF10B981),
-                  side: const BorderSide(color: Color(0xFF10B981)),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-        const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
+        const SizedBox(width: 16),
+        Expanded(
           child: ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(
