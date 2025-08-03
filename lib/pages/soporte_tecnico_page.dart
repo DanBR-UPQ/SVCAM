@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SoporteTecnicoPage extends StatefulWidget {
   const SoporteTecnicoPage({super.key});
@@ -34,16 +35,17 @@ class _SoporteTecnicoPageState extends State<SoporteTecnicoPage> with TickerProv
     super.dispose();
   }
 
-  void _contactarSoporte(BuildContext context) {
+  void _copiarAlPortapapeles(String texto, String tipo) {
+    Clipboard.setData(ClipboardData(text: texto));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.white),
-            SizedBox(width: 12),
+            const Icon(Icons.copy, color: Colors.white),
+            const SizedBox(width: 12),
             Text(
-              'Mensaje enviado a soporte técnico',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              '$tipo copiado al portapapeles',
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -52,7 +54,7 @@ class _SoporteTecnicoPageState extends State<SoporteTecnicoPage> with TickerProv
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        duration: const Duration(seconds: 3),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -100,9 +102,6 @@ class _SoporteTecnicoPageState extends State<SoporteTecnicoPage> with TickerProv
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Header animado
-              // _buildAnimatedHeader(),
-              
               // Contenido principal
               Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -111,6 +110,8 @@ class _SoporteTecnicoPageState extends State<SoporteTecnicoPage> with TickerProv
                     _buildFAQSection(),
                     const SizedBox(height: 32),
                     _buildContactSection(),
+                    const SizedBox(height: 32),
+                    _buildBackButton(),
                   ],
                 ),
               ),
@@ -120,7 +121,6 @@ class _SoporteTecnicoPageState extends State<SoporteTecnicoPage> with TickerProv
       ),
     );
   }
-
 
   Widget _buildFAQSection() {
     return Column(
@@ -152,7 +152,7 @@ class _SoporteTecnicoPageState extends State<SoporteTecnicoPage> with TickerProv
       },
       {
         'question': '¿Cuánto tiempo duran los códigos de visitante?',
-        'answer': 'Los códigos temporales tienen una duración configurable, generalmente de 24 horas. Puedes verificar el tiempo restante en "Consultar códigos".',
+        'answer': 'Los códigos tienen un tiempo ilimitado, siempre y cuando se cuente con usos restantes.',
         'icon': Icons.schedule,
       },
     ];
@@ -257,7 +257,7 @@ class _SoporteTecnicoPageState extends State<SoporteTecnicoPage> with TickerProv
               ),
               const SizedBox(height: 16),
               const Text(
-                'Nuestro equipo está aquí para ayudarte',
+                'Contacta con nuestro equipo',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
@@ -265,19 +265,9 @@ class _SoporteTecnicoPageState extends State<SoporteTecnicoPage> with TickerProv
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Responderemos tu consulta lo antes posible',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white.withOpacity(0.7),
-                ),
-              ),
               const SizedBox(height: 24),
-              _buildContactButton(),
-              const SizedBox(height: 16),
-              _buildBackButton(),
+              _buildContactInfo(),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -285,29 +275,138 @@ class _SoporteTecnicoPageState extends State<SoporteTecnicoPage> with TickerProv
     );
   }
 
-  Widget _buildContactButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () => _contactarSoporte(context),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF64748B),
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-          shape: RoundedRectangleBorder(
+  Widget _buildContactInfo() {
+    return Column(
+      children: [
+        // Teléfono
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF334155).withOpacity(0.3),
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFF475569),
+              width: 1,
+            ),
           ),
-          elevation: 0,
-        ),
-        icon: const Icon(Icons.send, size: 20),
-        label: const Text(
-          'Contactar Soporte',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+          child: InkWell(
+            onTap: () => _copiarAlPortapapeles('+52 442 123 4567', 'Teléfono'),
+            borderRadius: BorderRadius.circular(12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.phone,
+                    color: Color(0xFF10B981),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Teléfono',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF94A3B8),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        '+52 442 123 4567',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.copy,
+                  color: Colors.white.withOpacity(0.5),
+                  size: 16,
+                ),
+              ],
+            ),
           ),
         ),
-      ),
+        
+        // Email
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF334155).withOpacity(0.3),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFF475569),
+              width: 1,
+            ),
+          ),
+          child: InkWell(
+            onTap: () => _copiarAlPortapapeles('soporte@condominios.com', 'Correo'),
+            borderRadius: BorderRadius.circular(12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF3B82F6).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.email,
+                    color: Color(0xFF3B82F6),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Correo electrónico',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF94A3B8),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        'soporte@condominios.com',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.copy,
+                  color: Colors.white.withOpacity(0.5),
+                  size: 16,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
